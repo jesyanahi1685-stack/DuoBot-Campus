@@ -10,7 +10,7 @@ Preguntas en lenguaje natural, respuestas con gráficas y modelos de machine lea
 <p>
   <img src="https://img.shields.io/badge/Estado-En%20desarrollo-0ea5e9?style=for-the-badge" alt="Estado: En desarrollo" />
   <img src="https://img.shields.io/badge/Materia-Prog.%20L%C3%B3gica%20y%20Funcional%20%C2%B7%20U4-1e293b?style=for-the-badge" alt="Programación Lógica y Funcional - Unidad 4" />
-  <img src="https://img.shields.io/badge/Arquitectura-MCP%20%2B%20Claude%20API-6366f1?style=for-the-badge" alt="Arquitectura MCP + API IA" />
+  <img src="https://img.shields.io/badge/Arquitectura-MCP%20%2B%20API-6366f1?style=for-the-badge" alt="Arquitectura MCP + API IA" />
 </p>
 
 <p>
