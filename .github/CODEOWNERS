@@ -1,0 +1,13 @@
+# Reemplazar con los usuarios reales de GitHub de cada subequipo.
+# Estudiantes
+/apps/estudiantes/          @USUARIO-ESTUDIANTES-1 @USUARIO-ESTUDIANTES-2
+/services/mcp-estudiantes/  @USUARIO-ESTUDIANTES-1 @USUARIO-ESTUDIANTES-2
+
+# Administrativo
+/apps/admin/                @USUARIO-ADMIN-1 @USUARIO-ADMIN-2
+/services/mcp-admin/        @USUARIO-ADMIN-1 @USUARIO-ADMIN-2
+
+# Base comun: revisa cualquiera de los 4
+/packages/   @USUARIO-ESTUDIANTES-1 @USUARIO-ADMIN-1
+/docs/       @USUARIO-ESTUDIANTES-1 @USUARIO-ADMIN-1
+/infra/      @USUARIO-ESTUDIANTES-1 @USUARIO-ADMIN-1
