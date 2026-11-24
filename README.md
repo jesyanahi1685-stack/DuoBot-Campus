@@ -59,7 +59,7 @@ Está conformado por **dos aplicaciones web independientes**, cada una con un ch
 flowchart TD
     U(["Usuario"]) -->|"Pregunta en lenguaje natural"| FE["Chat Web<br/>Next.js · Vercel"]
     FE -->|"JWT de Supabase"| API["Servicio FastAPI + Servidor MCP<br/>Railway / Render"]
-    API <-->|"Descubre e invoca herramientas MCP"| CLAUDE["Claude API"]
+    API <-->|"Descubre e invoca herramientas MCP"| IA["API"]
 
     subgraph DATA["Datos, modelos y visualizaciones"]
         direction LR
