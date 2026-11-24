@@ -122,8 +122,8 @@ flowchart TD
 
 | Recurso | Acceso |
 | :--- | :--- |
-| **Demo Estudiantes** | _Pendiente_ |
-| **Demo Administrativo** | _Pendiente_ |
+| **Demo Estudiantes** | _estudiantes-theta.vercel.app_ |
+| **Demo Administrativo** | _admin-beta-tan-43.vercel.app_ |
 | **Documentación técnica** | [`docs/README_TECNICO.md`](docs/README_TECNICO.md) |
 
 > [!TIP]
