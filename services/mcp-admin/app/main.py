@@ -1,17 +1,29 @@
-"""Servidor MCP + API de Administrativo (esqueleto).
+"""Servidor MCP + API de Administrativo.
 
-- /health        -> verificacion de despliegue
-- /mcp           -> endpoint MCP (HTTP streamable) con las herramientas
+- GET  /health      verificacion de despliegue
+- GET  /me          perfil del usuario autenticado (rol y plan)
+- GET  /admin/ping  ejemplo de ruta restringida al rol admin
+- POST /chat        chatbot (Claude + herramientas MCP)
+- /mcp              endpoint MCP (HTTP streamable)
 Agregar herramientas en app/tools/ y registrarlas aqui.
 """
+import logging
 from contextlib import asynccontextmanager
+from typing import Literal
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
+from pydantic import BaseModel, Field
 
+from app.auth import current_profile, require_role
+from app.chat import run_chat
 from app.config import settings
+from app.models import Profile
+from app.tools import account
+
+log = logging.getLogger("duobot.admin")
 
 mcp = FastMCP(
     "duobot-admin",
@@ -30,6 +42,9 @@ def ping() -> str:
     return "pong desde DuoBot Campus - Administrativo"
 
 
+account.register(mcp)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     async with mcp.session_manager.run():
@@ -46,10 +61,45 @@ app.add_middleware(
 )
 
 
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str = Field(min_length=1, max_length=4000)
+
+
+class ChatRequest(BaseModel):
+    messages: list[ChatMessage] = Field(min_length=1, max_length=20)
+
+
 @app.get("/health")
 def health():
     return {"status": "ok", "service": "mcp-admin"}
 
 
-# El endpoint MCP queda en /mcp (se monta al final para no tapar /health)
+@app.get("/me")
+def me(profile: Profile = Depends(current_profile)):
+    return {"user_id": profile.user_id, "email": profile.email, "role": profile.role, "plan": profile.plan}
+
+
+@app.get("/admin/ping")
+def admin_ping(_: Profile = Depends(require_role("admin"))):
+    return {"ok": True}
+
+
+@app.post("/chat")
+async def chat(
+    req: ChatRequest,
+    authorization: str | None = Header(default=None),
+    _: Profile = Depends(current_profile),
+):
+    if not settings.anthropic_api_key:
+        raise HTTPException(status_code=503, detail="El asistente aun no esta configurado")
+    try:
+        reply = await run_chat([m.model_dump() for m in req.messages], authorization or "")
+    except Exception:  # no filtrar detalles internos al cliente
+        log.exception("Fallo el flujo del chat")
+        raise HTTPException(status_code=502, detail="No se pudo obtener respuesta del asistente")
+    return {"reply": reply}
+
+
+# El endpoint MCP queda en /mcp (se monta al final para no tapar las rutas anteriores)
 app.mount("/", mcp.streamable_http_app())
