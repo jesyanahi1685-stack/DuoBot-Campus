@@ -1,0 +1,3 @@
+Prueba de escritura de la integración de GitHub con ChatGPT.
+Rama: equipo-admin.
+Este archivo no forma parte del código de la aplicación y puede eliminarse después de verificar la conexión.
