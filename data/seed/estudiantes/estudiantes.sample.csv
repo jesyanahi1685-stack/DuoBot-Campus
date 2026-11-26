@@ -1,0 +1,21 @@
+student_id,career_id,career,age,semester,enrollment_year,enrollment_date,exit_date,previous_average,current_average,attendance_rate,subjects_enrolled,subjects_passed,subjects_failed,study_hours,scholarship,employment_status,academic_status
+100007,02,Ingeniería Electrónica,23,3,2024,2024-08-01,,88.16,100,93.27,6,6,0,16,True,True,Activo
+100063,01,Ingeniería en Sistemas Computacionales,24,9,2014,2014-08-01,2019-02-01,75.72,83.04,87.56,4,4,0,24,False,False,Graduado
+100068,06,Ingeniería Eléctrica,18,6,2023,2023-02-01,,83.23,94.45,96.24,4,4,0,3,False,True,Activo
+100103,09,Ingeniería Logística,22,7,2022,2022-08-01,,78.19,70.75,85.35,6,2,4,12,True,True,Activo
+100106,05,Ingeniería Mecánica,21,7,2022,2022-08-01,,81.32,78.42,100,5,3,2,11,False,False,Activo
+100117,03,Ingeniería Industrial,23,9,2016,2016-08-01,2021-02-01,89.81,84.17,84.47,5,5,0,14,True,True,Graduado
+100119,02,Ingeniería Electrónica,25,2,2015,2015-02-01,2016-02-01,67.26,64.43,74.22,7,4,3,3,False,False,Desertor
+100181,04,Ingeniería Mecatrónica,23,2,2025,2025-02-01,,79.8,87.12,90.73,7,5,2,2,True,True,Activo
+100183,07,Ingeniería en Gestión Empresarial,24,1,2024,2024-02-01,2024-08-01,82.55,91.06,89.63,6,6,0,8,True,False,Desertor
+100196,08,Ingeniería en Tecnologías de la Información,22,9,2015,2015-08-01,2020-02-01,91.21,78.43,69.86,6,4,2,10,False,False,Graduado
+100199,06,Ingeniería Eléctrica,22,9,2019,2019-08-01,2024-02-01,75.12,80.83,86.36,4,3,1,3,False,False,Graduado
+100216,04,Ingeniería Mecatrónica,24,9,2017,2017-02-01,2021-08-01,89.0,100,89.8,6,6,0,8,False,False,Graduado
+100270,01,Ingeniería en Sistemas Computacionales,23,1,2025,2025-08-01,,83.45,77.16,83.54,7,6,1,3,False,False,Activo
+100284,09,Ingeniería Logística,22,3,2017,2017-02-01,2018-08-01,72.55,66.41,69.02,4,2,2,6,True,False,Desertor
+100310,07,Ingeniería en Gestión Empresarial,25,9,2020,2020-02-01,2024-08-01,77.25,72.16,77.27,4,2,2,8,False,True,Graduado
+100394,05,Ingeniería Mecánica,23,3,2018,2018-08-01,2020-02-01,76.31,81.38,78.37,7,4,3,25,True,True,Desertor
+100473,08,Ingeniería en Tecnologías de la Información,24,9,2021,2021-08-01,,81.2,86.33,62.84,4,3,1,17,True,False,Activo
+100587,10,Ingeniería en Administración,23,9,2018,2018-02-01,2022-08-01,88.73,96.05,95.77,7,7,0,20,False,True,Graduado
+101259,10,Ingeniería en Administración,18,4,2020,2020-02-01,2022-02-01,68.3,52.42,65.93,4,1,3,14,False,False,Desertor
+101434,03,Ingeniería Industrial,24,1,2023,2023-02-01,2023-08-01,78.98,69.21,76.42,5,4,1,6,True,False,Desertor
