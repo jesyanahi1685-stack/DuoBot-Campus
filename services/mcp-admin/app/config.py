@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     mcp_internal_url: str = ""
     stripe_secret_key: str = ""
     stripe_webhook_secret: str = ""
+    stripe_price_id_premium: str = ""
 
 
 settings = Settings()
