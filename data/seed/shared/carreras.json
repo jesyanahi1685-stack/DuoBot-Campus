@@ -1,0 +1,13 @@
+
+[
+    {"career_id": "01", "career": "Ingeniería en Sistemas Computacionales"},
+    {"career_id": "02", "career": "Ingeniería Electrónica"},
+    {"career_id": "03", "career": "Ingeniería Industrial"},
+    {"career_id": "04", "career": "Ingeniería Mecatrónica"},
+    {"career_id": "05", "career": "Ingeniería Mecánica"},
+    {"career_id": "06", "career": "Ingeniería Eléctrica"},
+    {"career_id": "07", "career": "Ingeniería en Gestión Empresarial"},
+    {"career_id": "08", "career": "Ingeniería en Tecnologías de la Información"},
+    {"career_id": "09", "career": "Ingeniería Logística"},
+    {"career_id": "10", "career": "Ingeniería en Administración"}
+]

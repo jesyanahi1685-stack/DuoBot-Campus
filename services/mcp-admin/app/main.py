@@ -21,7 +21,7 @@ from app.auth import current_profile, require_role
 from app.chat import run_chat
 from app.config import settings
 from app.models import Profile
-from app.tools import account
+from app.tools import account, admin_indicators
 
 log = logging.getLogger("duobot.admin")
 
@@ -43,6 +43,7 @@ def ping() -> str:
 
 
 account.register(mcp)
+admin_indicators.register(mcp)
 
 
 @asynccontextmanager

@@ -12,6 +12,7 @@ from mcp.server.fastmcp import FastMCP
 from mcp.server.transport_security import TransportSecuritySettings
 
 from app.config import settings
+from app.tools import dataset_summary
 
 mcp = FastMCP(
     "duobot-estudiantes",
@@ -28,6 +29,9 @@ mcp = FastMCP(
 def ping() -> str:
     """Herramienta de prueba: confirma que el servidor MCP responde."""
     return "pong desde DuoBot Campus - Estudiantes"
+
+
+dataset_summary.register(mcp)
 
 
 @asynccontextmanager
