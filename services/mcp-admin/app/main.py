@@ -18,6 +18,7 @@ from mcp.server.transport_security import TransportSecuritySettings
 from pydantic import BaseModel, Field
 
 from app.auth import current_profile, require_role
+from app.billing import router as billing_router
 from app.chat import run_chat
 from app.config import settings
 from app.models import Profile
@@ -60,6 +61,9 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type", "Mcp-Session-Id"],
 )
+
+
+app.include_router(billing_router)
 
 
 class ChatMessage(BaseModel):

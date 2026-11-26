@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import AuthForm from "@/components/AuthForm";
+import Billing from "@/components/Billing";
 import Chat from "@/components/Chat";
 import { API_URL, APP } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -14,6 +15,7 @@ export default function Home() {
   const [session, setSession] = useState<Session | null>(null);
   const [ready, setReady] = useState(false);
   const [me, setMe] = useState<Me | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supabase) return setReady(true);
@@ -25,13 +27,46 @@ export default function Home() {
     return () => data.subscription.unsubscribe();
   }, [supabase]);
 
+  const fetchMe = useCallback(async (token: string): Promise<Me | null> => {
+    try {
+      const r = await fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${token}` } });
+      return r.ok ? await r.json() : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
   useEffect(() => {
     if (!session) return setMe(null);
-    fetch(`${API_URL}/me`, { headers: { Authorization: `Bearer ${session.access_token}` } })
-      .then((r) => (r.ok ? r.json() : null))
-      .then(setMe)
-      .catch(() => setMe(null));
-  }, [session]);
+    let cancelled = false;
+    const token = session.access_token;
+    const checkout = new URLSearchParams(window.location.search).get("checkout");
+    if (checkout) window.history.replaceState({}, "", window.location.pathname);
+
+    (async () => {
+      let current = await fetchMe(token);
+      if (cancelled) return;
+      setMe(current);
+      if (checkout === "cancel") return setNotice("El pago se canceló. No se hizo ningún cargo.");
+      if (checkout !== "success") return;
+      // El plan cambia cuando Stripe avisa por webhook: puede tardar unos segundos.
+      setNotice("Pago recibido. Actualizando tu plan…");
+      for (let i = 0; i < 8 && current?.plan !== "premium"; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        if (cancelled) return;
+        current = await fetchMe(token);
+        setMe(current);
+      }
+      setNotice(
+        current?.plan === "premium"
+          ? "¡Listo! Tu plan Premium está activo."
+          : "Aún no vemos la confirmación del pago. Recarga la página en unos minutos."
+      );
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [session, fetchMe]);
 
   const signOut = () => supabase?.auth.signOut();
 
@@ -66,7 +101,10 @@ export default function Home() {
       ) : !session ? (
         <AuthForm supabase={supabase} />
       ) : (
-        <Chat token={session.access_token} onUnauthorized={signOut} />
+        <>
+          {me && <Billing token={session.access_token} plan={me.plan} notice={notice} />}
+          <Chat token={session.access_token} onUnauthorized={signOut} />
+        </>
       )}
     </main>
   );
