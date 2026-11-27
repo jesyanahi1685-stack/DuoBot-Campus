@@ -141,3 +141,47 @@ Mínimo 3 en el avance 2 y 6 en el avance 3, por proyecto. Documentar cada una:
 Objetivo · integrantes · arquitectura y diagrama · las dos bases (propósito, estructura, relaciones,
 acceso) · instalación · variables de entorno · ejecución · despliegue · herramientas MCP · roles ·
 pagos · pruebas · limitaciones · enlaces.
+
+## 11. Prueba de humo de Estudiantes y Administrativo
+
+Usa un entorno de desarrollo con las migraciones aplicadas y los
+[datasets sintéticos cargados](../data/seed/README.md). En el `.env` local de ambos
+servicios, usa un `SUPABASE_JWT_SECRET` exclusivamente de prueba y un valor
+ficticio no vacío en `STRIPE_SECRET_KEY`. Prepara una identidad de prueba con
+plan `free` y sin fila en `subscriptions`. En Administrativo, crea el perfil
+con rol `admin` en su base de datos de desarrollo. Por ejemplo, para la base
+local predeterminada de Docker Compose y una identidad nueva:
+
+```bash
+docker compose exec -T postgres psql -U duobot -d duobot_admin_app -v ON_ERROR_STOP=1 <<'SQL'
+INSERT INTO profiles (user_id, email, role, plan)
+VALUES ('smoke-local', 'smoke-local@campus.test', 'admin', 'free');
+SQL
+```
+
+En Estudiantes, `GET /me` crea esa identidad con el rol `user` la primera vez.
+Desde la raíz, activa el entorno Python con las dependencias de un servicio
+(`python -m pip install -r services/mcp-estudiantes/requirements-dev.txt`).
+Exporta en tu terminal el mismo `SUPABASE_JWT_SECRET` sintético del servicio
+y genera un JWT de corta duración sin mostrarlo.
+
+```bash
+TOKEN=$(python -c 'import os, time, jwt; print(jwt.encode({"sub": "smoke-local", "email": "smoke-local@campus.test", "aud": "authenticated", "exp": int(time.time()) + 900}, os.environ["SUPABASE_JWT_SECRET"], algorithm="HS256"))')
+FECHA=$(date +%Y%m%d)
+python scripts/smoke_test.py --base-url http://localhost:8001 --token "$TOKEN" \
+  --out "docs/evidencia/smoke_${FECHA}_estudiantes.txt" --skip-chat
+python scripts/smoke_test.py --base-url http://localhost:8002 --token "$TOKEN" \
+  --out "docs/evidencia/smoke_${FECHA}_admin.txt" --skip-chat
+```
+
+Quita `--skip-chat` para probar `POST /chat` con Claude configurado o simulado
+en el servidor de desarrollo. La prueba comprueba salud, rol y plan, las
+herramientas MCP de cuenta y datos, y el HTTP 404 de `POST /billing/portal`
+para el perfil sin cliente Stripe. El portal usa POST, de acuerdo con la ruta
+de ambos servicios. Ejecuta la prueba solo contra un servidor de desarrollo
+con una clave Stripe ficticia y una identidad nueva sin fila de suscripción.
+Un perfil `free` e `inactive` puede conservar un cliente Stripe previo.
+La consola y el reporte muestran `OK`, `FALLO` u `OMITIDO` por
+comprobación. Un fallo devuelve código de salida 1. Sin `--out`, el reporte
+se guarda en `docs/evidencia/smoke_YYYYMMDD.txt`. Usa un `--out` diferente por
+servicio para conservar ambos reportes en la misma fecha.
