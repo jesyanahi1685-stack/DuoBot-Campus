@@ -54,6 +54,28 @@ cd apps/estudiantes && npm install && npm run dev    # http://localhost:3000
 cd apps/admin       && npm install && npm run dev    # http://localhost:3001
 ```
 
+Ejecuta el bloque de PowerShell desde la raíz del repositorio.
+
+```powershell
+# 1. Variables de entorno
+Copy-Item .env.example .env # llenar POSTGRES_PASSWORD como mínimo
+Copy-Item apps/estudiantes/.env.example apps/estudiantes/.env.local
+Copy-Item apps/admin/.env.example apps/admin/.env.local
+
+# 2. Bases y servicios
+docker compose up --build
+
+# 3. Estudiantes (en otra terminal, desde la raíz)
+Set-Location apps/estudiantes
+npm.cmd install
+if ($LASTEXITCODE -eq 0) { npm.cmd run dev } # http://localhost:3000
+
+# Administrativo (en otra terminal, desde la raíz)
+Set-Location apps/admin
+npm.cmd install
+if ($LASTEXITCODE -eq 0) { npm.cmd run dev } # http://localhost:3001
+```
+
 Verificación rápida:
 
 - `http://localhost:8001/health` y `http://localhost:8002/health` → `{"status":"ok",...}`
@@ -65,6 +87,13 @@ Para probar cada servicio, ejecuta estos comandos desde `services/mcp-estudiante
 `services/mcp-admin`.
 
 ```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
+
+Los mismos comandos funcionan en PowerShell.
+
+```powershell
 python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
@@ -81,12 +110,22 @@ python -m alembic upgrade head
 python -m alembic check
 ```
 
+En PowerShell, ejecuta el siguiente bloque desde el directorio de cada servicio.
+
+```powershell
+$env:DATABASE_URL = 'sqlite:///./ci.db'
+python -m alembic upgrade head
+python -m alembic check
+```
+
 CI también compila ambos frontends con Node 22, `npm install` y `npm run build`, con las
 variables `NEXT_PUBLIC_*` de configuración vacías. Desde la raíz, ejecuta
 `python scripts/check_common.py` para detectar archivos faltantes o diferencias en las
 copias del código común y sus migraciones. La comparación omite las asignaciones de
 `PROJECT` y normaliza los nombres visibles de DuoBot. Cada diferencia se informa por
 archivo y el comando devuelve un código de salida distinto de cero.
+
+En PowerShell, usa `npm.cmd install` y `npm.cmd run build` para cada frontend.
 
 ## 4. Variables de entorno
 
@@ -181,6 +220,15 @@ VALUES ('smoke-local', 'smoke-local@campus.test', 'admin', 'free');
 SQL
 ```
 
+En PowerShell, pasa el SQL a `psql` por la entrada estándar.
+
+```powershell
+@'
+INSERT INTO profiles (user_id, email, role, plan)
+VALUES ('smoke-local', 'smoke-local@campus.test', 'admin', 'free');
+'@ | docker compose exec -T postgres psql -U duobot -d duobot_admin_app -v ON_ERROR_STOP=1
+```
+
 En Estudiantes, `GET /me` crea esa identidad con el rol `user` la primera vez.
 Desde la raíz, activa el entorno Python con las dependencias de un servicio
 (`python -m pip install -r services/mcp-estudiantes/requirements-dev.txt`).
@@ -194,6 +242,46 @@ python scripts/smoke_test.py --base-url http://localhost:8001 --token "$TOKEN" \
   --out "docs/evidencia/smoke_${FECHA}_estudiantes.txt" --skip-chat
 python scripts/smoke_test.py --base-url http://localhost:8002 --token "$TOKEN" \
   --out "docs/evidencia/smoke_${FECHA}_admin.txt" --skip-chat
+```
+
+En PowerShell, sustituye el ejemplo por el mismo secreto sintético configurado
+en los servicios locales. El JWT se guarda en una variable de la sesión.
+
+```powershell
+$env:SUPABASE_JWT_SECRET = 'secreto-sintetico-solo-local-32-bytes'
+$smokeToken = @'
+import os
+import time
+import jwt
+
+claims = {
+    "sub": "smoke-local",
+    "email": "smoke-local@campus.test",
+    "aud": "authenticated",
+    "exp": int(time.time()) + 900,
+}
+print(jwt.encode(claims, os.environ["SUPABASE_JWT_SECRET"], algorithm="HS256"))
+'@ | python -
+if ($LASTEXITCODE -ne 0 -or -not $smokeToken) {
+  throw 'No se pudo generar el JWT de prueba'
+}
+
+$smokeDate = Get-Date -Format 'yyyyMMdd'
+$studentSmokeArgs = @(
+  '--base-url', 'http://localhost:8001',
+  '--token', $smokeToken,
+  '--out', "docs/evidencia/smoke_${smokeDate}_estudiantes.txt",
+  '--skip-chat'
+)
+$adminSmokeArgs = @(
+  '--base-url', 'http://localhost:8002',
+  '--token', $smokeToken,
+  '--out', "docs/evidencia/smoke_${smokeDate}_admin.txt",
+  '--skip-chat'
+)
+python scripts/smoke_test.py @studentSmokeArgs
+python scripts/smoke_test.py @adminSmokeArgs
+Remove-Variable smokeToken, studentSmokeArgs, adminSmokeArgs
 ```
 
 Quita `--skip-chat` para probar `POST /chat` con Claude configurado o simulado
