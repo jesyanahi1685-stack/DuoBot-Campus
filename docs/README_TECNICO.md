@@ -159,12 +159,12 @@ main                       ← base común, protegida (solo por Pull Request)
 - Cada subequipo toca solo su `apps/<proyecto>` y `services/mcp-<proyecto>`, así que los conflictos son mínimos.
 - Commits pequeños y con mensajes claros: el historial es parte de la evaluación.
 
-Responsables (llenar):
+Responsables
 
 | Subequipo | Integrantes | Carpetas |
 |---|---|---|
-| Estudiantes | _Nombre 1, Nombre 2_ | `apps/estudiantes`, `services/mcp-estudiantes` |
-| Administrativo | _Nombre 3, Nombre 4_ | `apps/admin`, `services/mcp-admin` |
+| Estudiantes | Jessika Diaz, Yudel Gonzales | `apps/estudiantes`, `services/mcp-estudiantes` |
+| Administrativo | Miranda Alvarez, Diego Mireles | `apps/admin`, `services/mcp-admin` |
 
 ## 7. Despliegue (plan)
 
