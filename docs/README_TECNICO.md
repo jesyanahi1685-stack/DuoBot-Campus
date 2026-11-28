@@ -61,10 +61,32 @@ Verificación rápida:
 - Si ya existía el volumen de Postgres antes de crear `init.sql`, ejecutar
   `docker compose down -v` para recrearlo (borra los datos locales).
 
-Pruebas del servicio: `cd services/mcp-estudiantes && pip install -r requirements.txt pytest httpx && pytest`
+Para probar cada servicio, ejecuta estos comandos desde `services/mcp-estudiantes` y desde
+`services/mcp-admin`.
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
 
 Migraciones: `alembic revision --autogenerate -m "mensaje"` y `alembic upgrade head`
 dentro de cada servicio.
+
+CI ejecuta las pruebas de cada servicio con Python 3.12 y verifica sus migraciones sobre
+SQLite. Para reproducir la verificación, usa una base local nueva y temporal.
+
+```bash
+export DATABASE_URL=sqlite:///./ci.db
+python -m alembic upgrade head
+python -m alembic check
+```
+
+CI también compila ambos frontends con Node 22, `npm install` y `npm run build`, con las
+variables `NEXT_PUBLIC_*` de configuración vacías. Desde la raíz, ejecuta
+`python scripts/check_common.py` para detectar archivos faltantes o diferencias en las
+copias del código común y sus migraciones. La comparación omite las asignaciones de
+`PROJECT` y normaliza los nombres visibles de DuoBot. Cada diferencia se informa por
+archivo y el comando devuelve un código de salida distinto de cero.
 
 ## 4. Variables de entorno
 
