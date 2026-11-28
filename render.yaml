@@ -1,0 +1,77 @@
+# Blueprint de Render para DuoBot Campus: un servicio web por proyecto (Docker, plan gratuito).
+# Guia paso a paso: docs/DESPLIEGUE.md. NO escribas secretos aqui: las variables con
+# "sync: false" se piden en el panel de Render al crear el Blueprint.
+#
+# Las rutas dockerfilePath y dockerContext son relativas a la RAIZ del repositorio
+# (por eso no se usa rootDir). La region no se puede cambiar despues de crear el servicio.
+
+services:
+  # ---------------------------------------------------------------- Estudiantes
+  - type: web
+    name: duobot-estudiantes
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./services/mcp-estudiantes/Dockerfile
+    dockerContext: ./services/mcp-estudiantes
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass # solo despliega si el CI de GitHub pasa
+    buildFilter:
+      paths:
+        - services/mcp-estudiantes/**
+    envVars:
+      - key: RUN_MIGRATIONS # aplica las migraciones de Alembic al arrancar
+        value: "1"
+      - key: FRONTEND_URL # origen exacto del frontend (CORS); ajusta si cambia el dominio de Vercel
+        value: https://estudiantes-theta.vercel.app
+      - key: DATABASE_URL # postgresql+psycopg://USUARIO:CLAVE@HOST/duobot_estudiantes_app?sslmode=require
+        sync: false
+      - key: MONGO_URL # mongodb+srv://USUARIO:CLAVE@CLUSTER/duobot_estudiantes_analytics?retryWrites=true&w=majority
+        sync: false
+      - key: SUPABASE_URL # https://TU-REF.supabase.co
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY # clave secreta de PRUEBA
+        sync: false
+      - key: STRIPE_PRICE_ID_PREMIUM # price_... del producto de Estudiantes
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET # whsec_... del endpoint de este servicio (se crea despues del primer despliegue)
+        sync: false
+      - key: MCP_ALLOWED_HOSTS # duobot-estudiantes.onrender.com,127.0.0.1:*,localhost:*
+        sync: false
+
+  # -------------------------------------------------------------- Administrativo
+  - type: web
+    name: duobot-admin
+    runtime: docker
+    plan: free
+    region: virginia
+    dockerfilePath: ./services/mcp-admin/Dockerfile
+    dockerContext: ./services/mcp-admin
+    healthCheckPath: /health
+    autoDeployTrigger: checksPass
+    buildFilter:
+      paths:
+        - services/mcp-admin/**
+    envVars:
+      - key: RUN_MIGRATIONS
+        value: "1"
+      - key: FRONTEND_URL
+        value: https://admin-beta-tan-43.vercel.app
+      - key: DATABASE_URL # postgresql+psycopg://USUARIO:CLAVE@HOST/duobot_admin_app?sslmode=require
+        sync: false
+      - key: MONGO_URL # mongodb+srv://USUARIO:CLAVE@CLUSTER/duobot_admin_analytics?retryWrites=true&w=majority
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_ID_PREMIUM # price_... del producto Administrativo
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: MCP_ALLOWED_HOSTS # duobot-admin.onrender.com,127.0.0.1:*,localhost:*
+        sync: false
