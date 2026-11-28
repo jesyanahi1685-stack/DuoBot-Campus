@@ -18,6 +18,7 @@ Preguntas en lenguaje natural, respuestas con gráficas y modelos de machine lea
   <a href="#cómo-funciona">Cómo funciona</a> ·
   <a href="#tecnologías">Tecnologías</a> ·
   <a href="#estado-del-proyecto">Estado</a> ·
+  <a href="#cómo-revisar">Cómo revisar</a> ·
   <a href="#equipo">Equipo</a> ·
   <a href="#enlaces">Enlaces</a>
 </p>
@@ -96,14 +97,27 @@ flowchart TD
 
 ## Estado del proyecto
 
-![Progreso](https://img.shields.io/badge/Progreso-1%20%2F%206%20hitos-0ea5e9?style=flat-square)
-
 - [x] Estructura base del monorepo
-- [ ] Autenticación y roles
-- [ ] Herramientas MCP (mínimo 6 por proyecto)
-- [ ] Datasets y modelos de ML
-- [ ] Pagos con Stripe (modo prueba)
+- [x] Autenticación con Supabase Auth y validación de JWT y roles en el backend
+- [x] PostgreSQL para perfiles, roles, planes y suscripciones. MongoDB para los datos analíticos sintéticos de cada proyecto.
+- [x] Tres herramientas MCP del avance 2 por proyecto. Ambos incluyen `get_user_profile` y `get_subscription_status`. Estudiantes incluye `query_dataset_summary` y Administrativo, `query_admin_indicators` (rol `admin`).
+- [x] Chat autenticado que descubre e invoca herramientas MCP con Claude
+- [x] Stripe en modo de prueba con Checkout, portal y webhook firmado que actualiza el plan
+- [x] CI para ambos servicios y ambos frontends, con ejecución en verde verificada en el [PR #5](https://github.com/jesyanahi1685-stack/DuoBot-Campus/pull/5)
+- [ ] Adjuntar capturas y reportes de humo por proyecto y registrar el flujo integrado con Supabase, Claude, MongoDB y Stripe en un entorno de prueba
+- [ ] Completar el mínimo de seis herramientas MCP por proyecto y los modelos de ML para el avance 3
 - [ ] Despliegue en producción
+
+---
+
+## Cómo revisar
+
+Recorrido de cinco minutos con el entorno de prueba configurado. Para prepararlo desde cero, sigue la [guía técnica](docs/README_TECNICO.md).
+
+1. **Minuto 1.** Abre Estudiantes y Administrativo. Inicia sesión con una cuenta de prueba en cada app. Usa una cuenta con rol `admin` para consultar indicadores administrativos. [Estudiantes local](http://localhost:3000) · [Administrativo local](http://localhost:3001).
+2. **Minuto 2.** En Estudiantes, pregunta «¿Cuál es el resumen académico de los estudiantes del dataset?». En Administrativo, pide indicadores de un año que esté incluido en los datos sembrados. El recorrido de chat requiere Claude configurado. [Flujo del chat](docs/AUTH_Y_CHAT.md#flujo).
+3. **Minutos 3 y 4.** Desde una cuenta de prueba con plan gratuito, abre **Mejorar a Premium**, completa Checkout con una tarjeta de prueba y comprueba la entrega del webhook y el cambio de plan. [Guía de Stripe](docs/PAGOS_STRIPE.md#probar-en-local).
+4. **Minuto 5.** Revisa las comprobaciones de CI y el índice de evidencia. La guía técnica incluye el procedimiento de humo para repetir las comprobaciones de API en ambos servicios. [CI](https://github.com/jesyanahi1685-stack/DuoBot-Campus/pull/5/checks) · [Prueba de humo](docs/README_TECNICO.md#11-prueba-de-humo-de-estudiantes-y-administrativo) · [Evidencia](docs/evidencia/README.md).
 
 ---
 
